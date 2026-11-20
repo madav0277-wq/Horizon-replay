@@ -1,0 +1,12 @@
+[package]
+name = "mod-horizon-replay"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+# Horizon's Android build service rewrites this dependency to the exact
+# checked-out game source before compiling the trait mod.
+horizon-client = { git = "https://github.com/horizon-rust/horizon" }
