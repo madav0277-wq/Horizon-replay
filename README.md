@@ -10,22 +10,22 @@ The target Android fork revision used by this project is
 in the catalog with an **unsupported** status, and that compiling and running
 them on Android is deferred.
 
-That means this repository cannot currently produce a playable native replay
-mod for that Android build. A ZIP file renamed to `.hnmod` does not change
-that, and a successful archive check is not a game build.
+The fork does contain a native hook system and a `Hooks` trait API, but that
+does not mean the Android launcher can currently build or load a native bundle.
+A ZIP file renamed to `.hnmod` does not change that.
 
 ## Current repository status
 
-<badge>Prototype only</badge>
+**Prototype only. Not installable.**
 
 The existing `api/src/lib.rs` contains an experimental camera-path recorder,
-binary replay codec, interpolation and keyboard-control design. It was written
-against a guessed trait API and has **not** been verified against the target
-Android fork. Do not treat it as compiled or working code.
+binary replay codec, interpolation and keyboard-control design. Its imports
+and hook signatures have not been verified by compiling against the exact
+target revision. Do not treat it as compiled or working code.
 
-The previous packaging metadata and script also do not match the official
-Horizon native source-mixin bundle layout. They are retained in the repository
-for audit/history only and must not be used to install the mod.
+The previous packaging metadata and script did not match the official Horizon
+native source-mixin bundle layout. Those unverified files and the workflow that
+produced a misleading archive have been removed.
 
 ## Intended replay features
 
@@ -40,8 +40,9 @@ for audit/history only and must not be used to install the mod.
 
 1. Horizon-Android must add native `.hnmod` compilation/loading support, or expose
    another supported Android extension API capable of controlling the camera.
-2. The replay implementation must be rewritten against that real API.
-3. The resulting bundle must pass the official source-mixin validation/build.
+2. The replay implementation must be compiled against that exact API and fixed
+   until its tests pass.
+3. The bundle must pass the official source-mixin validation/build.
 4. The built game must be tested on an Android device.
 
 Until those conditions are met, there is no installable replay mod here.
