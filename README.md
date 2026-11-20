@@ -1,48 +1,52 @@
 # Horizon Replay
 
-A replay-mod research project for **Horizon-Android / Minecraft 26.3**.
+A native camera-replay mod for **Horizon-Android / Minecraft 26.3**.
 
-## Important: Android support blocker
+## Current implementation
 
-The target Android fork revision used by this project is
-`ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba`. Its own release notes
-(`docs/android-0.7.5.md`) state that source-only `.hnmod` entries are visible
-in the catalog with an **unsupported** status, and that compiling and running
-them on Android is deferred.
+The first milestone records and replays the camera path:
 
-The fork does contain a native hook system and a `Hooks` trait API, but that
-does not mean the Android launcher can currently build or load a native bundle.
-A ZIP file renamed to `.hnmod` does not change that.
+- Capture camera position, yaw and pitch through Horizon's `camera_pose` hook.
+- Record at 20 samples per second.
+- Save and load a bounded, versioned `.hrp` replay file in the mod config directory.
+- Interpolate position and rotation during playback.
+- Pause, stop and change playback speed.
+- Show status and controls in the HUD.
 
-## Current repository status
+The implementation uses the actual Horizon API: `Hooks::frame`, `Hooks::key`, `Hooks::hud`, `Hooks::camera_pose`, and `Host::camera/config_dir/text`. This was checked against the target Android source tree. It has **not yet been compiled or device-tested**, so it is not being presented as a verified working release.
 
-**Prototype only. Not installable.**
+## Native bundle format
 
-The existing `api/src/lib.rs` contains an experimental camera-path recorder,
-binary replay codec, interpolation and keyboard-control design. Its imports
-and hook signatures have not been verified by compiling against the exact
-target revision. Do not treat it as compiled or working code.
+This is a native code mod, not a content-only pack. Horizon's native source bundle format is **`.hnmod`**; `.hmod` is the content-mod format in the target documentation. The Android documentation lists the native runtime for ARM64 and x86_64 builds.
 
-The previous packaging metadata and script did not match the official Horizon
-native source-mixin bundle layout. Those unverified files and the workflow that
-produced a misleading archive have been removed.
+The source bundle is laid out under `mixins/horizon-replay/`. Run:
 
-## Intended replay features
+```sh
+python packaging/package_hnmod.py
+```
 
-- Record camera position, yaw and pitch with timestamps.
-- Save and load replay files.
-- Smoothly interpolate camera movement during playback.
-- Pause, resume, stop and adjust playback speed.
-- Add touch-friendly controls and a timeline.
-- Later investigate entity snapshots, animations and world-change capture.
+This creates `dist/horizon-replay.hnmod`. The GitHub Actions workflow also creates it as an artifact on pushes to `main`. Packaging the source archive is not the same as compiling it into the game; the Horizon launcher performs the native build for the installed game revision.
 
-## What must happen before Android installation is possible
+## Not implemented yet
 
-1. Horizon-Android must add native `.hnmod` compilation/loading support, or expose
-   another supported Android extension API capable of controlling the camera.
-2. The replay implementation must be compiled against that exact API and fixed
-   until its tests pass.
-3. The bundle must pass the official source-mixin validation/build.
-4. The built game must be tested on an Android device.
+- Entity recording and playback (players, mobs, equipment and animations).
+- Block/world-change recording.
+- Touch-first replay controls and a seekable timeline.
+- Multiple replay files and import/export management.
 
-Until those conditions are met, there is no installable replay mod here.
+## Target
+
+- Android fork: `GoyDevv/Horizon-Android`
+- Game: Minecraft 26.3
+- Source revision used for API inspection: `ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba`
+
+## Verification status
+
+- [x] Confirmed the camera-pose, frame, key and HUD hooks exist in the target API.
+- [x] Added the native bundle manifest and source layout.
+- [x] Added repeatable `.hnmod` packaging and a GitHub Actions artifact workflow.
+- [ ] Rust compile against the exact Android source revision.
+- [ ] Native launcher build on Android.
+- [ ] In-game recording/playback test on a phone.
+
+Do not treat the archive as a tested release until the remaining checks pass.
