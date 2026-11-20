@@ -97,7 +97,25 @@ impl Hooks for HorizonReplay {
             return;
         }
 
-        match event.key {
+        // Mouse buttons in the replay panel map to the same actions as hotkeys.
+        let key = if event.key == "key.mouse.left" {
+            let [x, y] = host.cursor();
+            if (x >= 16.0 && x <= 102.0 && y >= 88.0 && y <= 108.0 {
+                "key.keyboard.f8"
+            } else if (x >= 108.0 && x <= 190.0 && y >= 88.0 && y <= 108.0 {
+                "key.keyboard.f9"
+            } else if (x >= 16.0 && x <= 102.0 && y >= 114.0 && y <= 134.0 {
+                "key.keyboard.f7"
+            } else if (x >= 108.0 && x <= 190.0 && y >= 114.0 && y <= 134.0 {
+                "key.keyboard.f10"
+            } else {
+                ""
+            }
+        } else {
+            event.key
+        };
+
+        match key {
             "key.keyboard.f8" => {
                 let save = {
                     let mut state = lock_state();
@@ -248,6 +266,36 @@ impl Hooks for HorizonReplay {
 
     fn hud(&self, host: &mut dyn Host, event: &mut HudEvent<'_>) {
         let state = lock_state();
+
+        // Compact clickable control panel. Coordinates are GUI pixels.
+        host.fill(event.batch, [8.0, 34.0, 194.0, 112.0], 0xD9161920);
+        host.fill(event.batch, [8.0, 34.0, 194.0, 20.0], 0xFF252B36);
+        host.text(event.batch, "HORIZON REPLAY", [16.0, 40.0], 0xFFFFFF, true);
+
+        let status = if state.recording {
+            format!("RECORDING  •  {} samples", state.samples.len())
+        } else if state.playing && state.paused {
+            format!("PAUSED  •  {:.1}s  •  {:.2}x", state.playhead, state.speed)
+        } else if state.playing {
+            format!("PLAYING  •  {:.1}s  •  {:.2}x", state.playhead, state.speed)
+        } else {
+            state.status.clone()
+        };
+        host.text(event.batch, &status, [16.0, 62.0], 0xE8E8E8, true);
+
+        let record_color = if state.recording { 0xFF8B3030 } else { 0xFF315B43 };
+        host.fill(event.batch, [16.0, 88.0, 86.0, 20.0], record_color);
+        host.text(event.batch, if state.recording { "SAVE" } else { "RECORD" }, [38.0, 94.0], 0xFFFFFF, true);
+
+        host.fill(event.batch, [108.0, 88.0, 82.0, 20.0], 0xFF31506F);
+        host.text(event.batch, "PLAY", [137.0, 94.0], 0xFFFFFF, true);
+
+        host.fill(event.batch, [16.0, 114.0, 86.0, 20.0], 0xFF55505F);
+        host.text(event.batch, if state.paused { "RESUME" } else { "PAUSE" }, [37.0, 120.0], 0xFFFFFF, true);
+
+        host.fill(event.batch, [108.0, 114.0, 82.0, 20.0], 0xFF684040);
+        host.text(event.batch, "STOP", [136.0, 120.0], 0xFFFFFF, true);
+
         let line = if state.recording {
             format!("Horizon Replay  •  REC  •  {} samples", state.samples.len())
         } else if state.playing && state.paused {
