@@ -56,7 +56,7 @@ Horizon-Android native mods are compiled by Horizon's native build service; the 
 - [ ] Add entity snapshots and replay actors.
 - [ ] Add entity animation/state capture where the API permits.
 - [ ] Add block/world-change capture and a safe playback representation.
-- [ ] Add timeline, seeking and speed controls.
+- [ ] Add a touch-friendly timeline and seeking controls.
 - [ ] Export/import multiple replay files.
 
 ## Compatibility notes
