@@ -137,7 +137,7 @@ impl Hooks for HorizonReplay {
                     Ok((dimension, samples)) if samples.len() >= 2 => {
                         let current_dimension = host.camera().map(|camera| camera.dimension);
                         let mut state = lock_state();
-                        if current_dimension.as_deref().is_some_and(|d| d != dimension) {
+                        if current_dimension.as_deref().is_some_and(|d| d != dimension.as_str()) {
                             state.status = "Replay belongs to another dimension".into();
                             state.playing = false;
                         } else {
@@ -202,27 +202,26 @@ impl Hooks for HorizonReplay {
             if elapsed - state.last_sample >= SAMPLE_INTERVAL {
                 if let Some(dimension) = current_dimension {
                     if !state.dimension.is_empty() && state.dimension != dimension {
-                        state.recording = false;
-                        state.started = None;
-                        state.status = "Recording stopped after dimension change".into();
+                        // Stop adding samples from the new dimension, but keep
+                        // F8 available to save the recording already captured.
+                        state.status = "Dimension changed; press F8 to save".into();
                         return;
                     }
                     state.dimension = dimension;
                 }
 
-                if state.samples.len() < MAX_SAMPLES {
-                    state.samples.push(Sample {
-                        time: elapsed,
-                        position: event.position,
-                        yaw: event.yaw,
-                        pitch: event.pitch,
-                    });
-                    state.last_sample = elapsed;
-                } else {
-                    state.recording = false;
-                    state.started = None;
+                if state.samples.len() >= MAX_SAMPLES {
+                    // Keep the recording state armed so F8 still saves the full buffer.
                     state.status = "Recording limit reached; press F8 to save".into();
+                    return;
                 }
+                state.samples.push(Sample {
+                    time: elapsed,
+                    position: event.position,
+                    yaw: event.yaw,
+                    pitch: event.pitch,
+                });
+                state.last_sample = elapsed;
             }
             return;
         }
@@ -233,7 +232,7 @@ impl Hooks for HorizonReplay {
 
         if current_dimension
             .as_deref()
-            .is_some_and(|dimension| dimension != state.dimension)
+            .is_some_and(|dimension| dimension != state.dimension.as_str())
         {
             state.playing = false;
             state.status = "Playback stopped: dimension changed".into();
@@ -323,14 +322,18 @@ fn save_replay(host: &dyn Host, dimension: &str, samples: &[Sample]) -> Result<(
 
 fn load_replay(host: &dyn Host) -> Result<(String, Vec<Sample>), String> {
     let path = replay_path(host)?;
-    let bytes = fs::read(path).map_err(|error| error.to_string())?;
-    if bytes.len() > MAX_REPLAY_BYTES {
+    let size = fs::metadata(&path).map_err(|error| error.to_string())?.len();
+    if size > MAX_REPLAY_BYTES as u64 {
         return Err("replay file exceeds the size limit".into());
     }
+    let bytes = fs::read(path).map_err(|error| error.to_string())?;
     decode_replay(&bytes)
 }
 
 fn encode_replay(dimension: &str, samples: &[Sample]) -> Result<Vec<u8>, String> {
+    if samples.len() < 2 {
+        return Err("at least two samples are required".into());
+    }
     if samples.len() > MAX_SAMPLES {
         return Err("too many samples".into());
     }
