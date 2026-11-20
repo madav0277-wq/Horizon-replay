@@ -2,5 +2,8 @@
 id = "horizon-replay"
 version = "0.1.0"
 
+[compatibility]
+horizon_revision = "ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba"
+
 [api]
 path = "api"
