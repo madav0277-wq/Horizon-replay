@@ -9,7 +9,6 @@ use horizon_client::mod_api::{
     CameraPoseEvent, FrameEvent, Host, Hooks, HudEvent, KeyEvent,
 };
 use std::fs;
-use std::io;
 use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 use std::time::Instant;
