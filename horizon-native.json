@@ -1,5 +1,6 @@
 {
   "game": "26.3",
+  "horizon": "ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba",
   "hooks": 415,
   "id": "horizon-replay",
   "mixins": "0d6b103c70633d8fd9443d8d0acd3aadaacedb06",
