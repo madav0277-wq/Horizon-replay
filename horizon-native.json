@@ -1,9 +1,0 @@
-{
-  "schema": 1,
-  "id": "horizon_replay",
-  "version": "0.1.0",
-  "game": "26.3",
-  "horizon": "ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba",
-  "mixins": "1e758beab4f00b7ab82183f5b4a7ec4f42599a98",
-  "hooks": 415
-}
