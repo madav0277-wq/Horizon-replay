@@ -1,0 +1,6 @@
+[mod]
+id = "horizon-replay"
+version = "0.1.0"
+
+[api]
+path = "api"
