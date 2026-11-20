@@ -1,0 +1,30 @@
+# Rust build output
+/target/
+**/*.rs.bk
+
+# Generated build/package output
+/dist/
+/build/
+*.log
+*.tmp
+
+# Python tooling (if used for scripts/tests)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Android/Gradle local state
+.gradle/
+local.properties/
+
+# OS files
+.DS_Store
+Thumbs.db
