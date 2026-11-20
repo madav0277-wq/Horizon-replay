@@ -1,5 +1,5 @@
 # Native Horizon mod manifest.
-# This pins the Android fork revision whose mod API was inspected.
+# The Android build service replaces this with the exact Horizon source revision for the selected game build.
 [mod]
 id = "horizon_replay"
 version = "0.1.0"
