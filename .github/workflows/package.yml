@@ -1,4 +1,4 @@
-name: Package Horizon Replay
+name: Verify and package Horizon Replay
 
 on:
   push:
@@ -9,10 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  package:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile and test replay implementation against pinned Android API
+        run: cargo test --manifest-path ci/Cargo.toml
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
