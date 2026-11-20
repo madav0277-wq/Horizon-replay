@@ -20,6 +20,8 @@ The first working-code milestone is a **camera-path recorder and playback protot
 | F8 | Start recording; press again to save |
 | F9 | Load and play the latest replay |
 | F7 | Pause / resume playback |
+| F5 | Halve playback speed (minimum 0.25x) |
+| F6 | Double playback speed (maximum 4x) |
 | F10 | Stop |
 
 These are keyboard controls in this first milestone. Touch buttons are not implemented yet.
