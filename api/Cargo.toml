@@ -7,4 +7,6 @@ edition = "2024"
 crate-type = ["rlib"]
 
 [dependencies]
-horizon-client = { git = "https://github.com/GoyDevv/Horizon-Android", rev = "ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba" }
+# Horizon's Android build service rewrites this dependency to the exact
+# checked-out game source before compiling the trait mod.
+horizon-client = { git = "https://github.com/horizon-rust/horizon" }
