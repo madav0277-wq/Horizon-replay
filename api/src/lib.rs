@@ -162,6 +162,18 @@ impl Hooks for HorizonReplay {
                     state.status = if state.paused { "PAUSED" } else { "PLAYING" }.into();
                 }
             }
+            "key.keyboard.f5" => {
+                let mut state = lock_state();
+                if state.playing {
+                    state.speed = (state.speed / 2.0).max(0.25);
+                }
+            }
+            "key.keyboard.f6" => {
+                let mut state = lock_state();
+                if state.playing {
+                    state.speed = (state.speed * 2.0).min(4.0);
+                }
+            }
             "key.keyboard.f10" => {
                 let mut state = lock_state();
                 state.recording = false;
@@ -240,9 +252,10 @@ impl Hooks for HorizonReplay {
         let line = if state.recording {
             format!("Horizon Replay  •  REC  •  {} samples", state.samples.len())
         } else if state.playing && state.paused {
-            format!("Horizon Replay  •  PAUSED  •  {:.1}s", state.playhead)
+            format!("Horizon Replay  •  PAUSED  •  {:.1}s  •  {:.2}x", state.playhead, state.speed)
         } else if state.playing {
-            format!("Horizon Replay  •  PLAY  •  {:.1}s", state.playhead)
+            let duration = state.samples.last().map(|sample| sample.time).unwrap_or(0.0);
+            format!("Horizon Replay  •  PLAY  •  {:.1}/{:.1}s  •  {:.2}x", state.playhead, duration, state.speed)
         } else {
             format!("Horizon Replay  •  {}", state.status)
         };
@@ -250,7 +263,7 @@ impl Hooks for HorizonReplay {
         host.text(event.batch, &line, [10.0, 10.0], 0xFFFFFF, true);
         host.text(
             event.batch,
-            "F8 Record/Save   F9 Play   F7 Pause   F10 Stop",
+            "F8 Record/Save   F9 Play   F7 Pause   F5/F6 Speed   F10 Stop",
             [10.0, 22.0],
             0xD0D0D0,
             true,
