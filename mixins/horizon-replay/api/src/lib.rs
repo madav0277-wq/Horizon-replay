@@ -100,13 +100,13 @@ impl Hooks for HorizonReplay {
         // Mouse buttons in the replay panel map to the same actions as hotkeys.
         let key = if event.key == "key.mouse.left" {
             let [x, y] = host.cursor();
-            if (x >= 16.0 && x <= 102.0 && y >= 88.0 && y <= 108.0 {
+            if (x >= 16.0 && x <= 102.0 && y >= 88.0 && y <= 108.0) {
                 "key.keyboard.f8"
-            } else if (x >= 108.0 && x <= 190.0 && y >= 88.0 && y <= 108.0 {
+            } else if (x >= 108.0 && x <= 190.0 && y >= 88.0 && y <= 108.0) {
                 "key.keyboard.f9"
-            } else if (x >= 16.0 && x <= 102.0 && y >= 114.0 && y <= 134.0 {
+            } else if (x >= 16.0 && x <= 102.0 && y >= 114.0 && y <= 134.0) {
                 "key.keyboard.f7"
-            } else if (x >= 108.0 && x <= 190.0 && y >= 114.0 && y <= 134.0 {
+            } else if (x >= 108.0 && x <= 190.0 && y >= 114.0 && y <= 134.0) {
                 "key.keyboard.f10"
             } else {
                 ""
