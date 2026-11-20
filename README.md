@@ -2,9 +2,13 @@
 
 A native replay-mod project for **Horizon-Android / Minecraft 26.3**.
 
+## Package format
+
+This is a native Rust mod and is packaged as **`.hnmod`**. It is not an APK and it is not a content-only `.hmod`.
+
 ## Current implementation
 
-The first working-code milestone is a **camera-path recorder and playback prototype** implemented against Horizon's native trait-mod API:
+The first implementation milestone is a camera-path recorder and playback prototype using Horizon's native trait-mod API:
 
 - Records camera position, yaw and pitch at up to 20 samples per second.
 - Saves a bounded replay file as `latest.hrp` under Horizon's mod config directory.
@@ -26,31 +30,38 @@ The first working-code milestone is a **camera-path recorder and playback protot
 
 These are keyboard controls in this first milestone. Touch buttons are not implemented yet.
 
+## Build the .hnmod bundle
+
+The repository includes `horizon-native.json` and a reproducible packager:
+
+```sh
+python3 tools/package_hnmod.py
+```
+
+It creates `dist/horizon_replay.hnmod`. GitHub Actions also runs this packager on pushes to `main` and uploads the `.hnmod` as the `horizon-replay-hnmod` workflow artifact.
+
+The package pins Horizon commit `ae4c85dc5b31da2078ee1e1009a53ced7d7ed1ba`, horizon-mixins commit `1e758beab4f00b7ab82183f5b4a7ec4f42599a98`, and native hooks API 1 (the `camera_pose` contract). Horizon's launcher builds native code for the game instance; the `.hnmod` is the source bundle, not a precompiled APK or shared library.
+
 ## Important limitations
 
-This is **not yet a complete Replay Mod**. The current code records the view camera pose, not a full player/entity/world snapshot. It does not yet record nearby entities, entity animations, block changes, inventory state, or world restoration. It also has not yet been compiled or tested inside Horizon on an Android device.
+This is **not yet a complete Replay Mod**. The current code records the view camera pose, not a full player/entity/world snapshot. It does not yet record nearby entities, entity animations, block changes, inventory state, or world restoration.
 
-The camera hook is documented by the target source as a cinematic/replay-camera hook. The mod uses the supported `Hooks::camera_pose`, `Hooks::frame`, `Hooks::key`, and `Hooks::hud` trait methods instead of guessed game internals.
+The code and package have not yet been compiled by Horizon's native build pipeline or tested inside the Android game. A successful ZIP/package check is not a successful native compilation.
 
 ## Project layout
 
 ```
-horizon-mixin.toml    Native trait-mod manifest
-api/Cargo.toml        Trait-mod crate metadata
-api/src/lib.rs        Recorder, playback, HUD and replay-file codec
-.gitignore
-README.md
+horizon-native.json     Native bundle metadata
+horizon-mixin.toml      Native mod manifest and Horizon revision pin
+api/Cargo.toml          Trait-mod crate metadata
+api/src/lib.rs          Recorder, playback, HUD and replay-file codec
+tools/package_hnmod.py  .hnmod packager and archive validation
+.github/workflows/      Automatic .hnmod packaging
 ```
-
-The Android native build pipeline reads the `[api]` path from `horizon-mixin.toml`, copies `api/src`, and links the trait mod into the generated game build. The pipeline replaces the game-source revision with the exact source commit selected for that build.
-
-## Build and installation
-
-Horizon-Android native mods are compiled by Horizon's native build service; the phone does not compile the full game locally. A distributable `.hnmod` still needs to be packaged with the exact Horizon source revision and hook compatibility metadata for the target build. This repository currently contains the source bundle, not a tested installable package.
 
 ## Next milestones
 
-- [ ] Compile the trait mod against the exact Horizon build selected by the Android build service.
+- [ ] Compile the native bundle against the pinned Horizon source.
 - [ ] Test recording, saving, loading and playback on-device.
 - [ ] Add touch-friendly controls.
 - [ ] Add entity snapshots and replay actors.
@@ -58,10 +69,6 @@ Horizon-Android native mods are compiled by Horizon's native build service; the 
 - [ ] Add block/world-change capture and a safe playback representation.
 - [ ] Add a touch-friendly timeline and seeking controls.
 - [ ] Export/import multiple replay files.
-
-## Compatibility notes
-
-The implementation was inspected against the public `GoyDevv/Horizon-Android` source and its native hook catalog. The build service rewrites the game revision at build time. Do not treat this source-only repository as a finished mod release until an Android build succeeds.
 
 ## License
 
